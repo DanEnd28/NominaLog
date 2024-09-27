@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  #? ===========================app Services==========================================
+
+  # ================================================
+  #             App Service
+  # ================================================
+  alfanar_app:
+    container_name: alfanar_app
+    image: alfanar_app
+    build: . # Directory of Dockerfile
+    ports:
+      - 127.0.0.1:8000:8000
+    working_dir: /app
+    volumes:
+      - .:/app # Folder of the app in host: workdir docker
+    environment:
+      - DJANGO_DEBUG=false
+      #- POSTGRES_HOST=nominalog_db # Same name as db service
+      #- POSTGRES_PORT=5432
+    restart: unless-stopped
+
+  # ================================================
+  #             Database Service
+  # ================================================
+  nominalog_db:
+    container_name: nominalog_db
+    image: postgres:16
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER} # Uses the .env composer example or ${DBUSER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - app_data:/var/lib/postgresql/data
+    ports:
+      - 127.0.0.1:5430:5432
+    restart: unless-stopped
+
+  # ================================================
+  #             Nginx Service
+  # ================================================
+  nginx:
+    image: nginx
+    container_name: nginx_service
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - static:/var/www/static
+    ports:
+      - 0.0.0.0:80:80
+      - 0.0.0.0:443:443
+    restart: unless-stopped
+    depends_on:
+      - alfanar_app
+
+  # ================================================
+  #             Redis Cache Service
+  # ================================================
+  redis:
+    container_name: redis_service
+    image: redis:7.2.4-alpine
+    restart: unless-stopped
+    ports:
+      - 0.0.0.0:6379:6379
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
+
+  # ================================================
+  #             RabbitMQ Service Service
+  # ================================================
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_service
+    restart: unless-stopped
+    ports:
+      - 0.0.0.0:5672:5672 # Puerto de comunicación AMQP
+      - 0.0.0.0:15672:15672 # Puerto de interfaz visual de administracion de rabbitMQ
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+      - RABBITMQ_NODENAME=rabbit_alfanar@localhost # Esto para persistir la data
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/
+
+volumes:
+  app_data: {}
+  static: {}
+  redis_data: {}
+  rabbitmq_data: {}

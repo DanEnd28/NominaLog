@@ -1,0 +1,32 @@
+{
+  "name": "nomina-api",
+  "version": "1.0.0",
+  "description": "API de Nóminas con Express.js, Swagger y Redoc",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.17.1",
+    "helmet": "^7.0.0",
+    "morgan": "^1.10.0",
+    "pg": "^8.10.0",
+    "sequelize": "^6.31.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^4.6.3",
+    "express-formidable": "^1.2.0",
+    "express-session": "^1.17.3",
+    "tslib": "^2.5.0",
+    "@jridgewell/sourcemap-codec": "^1.4.15",
+    "@popperjs/core": "^2.11.7",
+    "openapi-types": "^12.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "type": "module",
+  "license": "MIT"
+}
